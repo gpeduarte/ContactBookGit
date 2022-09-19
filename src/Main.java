@@ -1,5 +1,4 @@
-import contactBook.Contact;
-import contactBook.ContactBook;
+import contactBook.*;
 
 import java.util.Scanner;
 
@@ -13,7 +12,8 @@ public class Main {
     public static final String SET_PHONE      = "SP";
     public static final String SET_EMAIL      = "SE";
     public static final String LIST_CONTACTS  = "LC";
-    public static final String GET_BY_NUMBER = "GN";
+    public static final String GET_BY_NUMBER  = "GN";
+    public static final String EXISTS_PHONE   = "EP";
     public static final String QUIT           = "Q";
 
     //Constantes que definem as mensagens para o utilizador
@@ -24,6 +24,8 @@ public class Main {
     public static final String CONTACT_UPDATED = "contactBook.Contact updated.";
     public static final String BOOK_EMPTY = "contactBook.Contact book empty.";
     private static final String PHONE_NUMBER_ERROR = "Phone number does not exist." ;
+    public static final String SAME_PHONE_NUMBER = "There are contacts that share phone numbers.";
+    public static final String DIFFERENT_PHONE_NUMBER = "All contacts have different phone numbers";
     public static final String QUIT_MSG = "Goodbye!";
     public static final String COMMAND_ERROR = "Unknown command.";
 
@@ -58,6 +60,9 @@ public class Main {
                 case GET_BY_NUMBER:
                     getContactByNumber(in,cBook);
                     break;
+                case EXISTS_PHONE:
+                    samePhone(cBook);
+                    break;
                 default:
                     System.out.println(COMMAND_ERROR);
             }
@@ -86,6 +91,33 @@ public class Main {
         if (!found) {
             System.out.println(PHONE_NUMBER_ERROR);
         }
+    }
+
+    private static void samePhone(ContactBook cBook) {
+        Contact auxCBook = new Contact("name", 0, "email");
+        Contact auxAuxCB = new Contact("name", 0, "email");
+        ContactBook auxCB = new ContactBook();
+        int count = 0;
+        boolean same = false;
+        cBook.initializeIterator();
+        auxCB=cBook;
+        if(cBook.hasNext() && auxCB.hasNext()) {
+            auxCBook=cBook.next();
+            auxAuxCB=auxCB.next();
+        }
+        while(cBook.hasNext() && auxCB.hasNext() && !same) {
+            auxCBook=cBook.next();
+            count++;
+            if(auxCBook.getPhone()==auxAuxCB.getPhone()) {
+                same = true;
+                System.out.println(SAME_PHONE_NUMBER);
+            }else if(count==cBook.getNumberOfContacts() && auxCB.hasNext()) {
+                for(int i = 0; i < count; i++) {
+                    auxCBook=cBook.next();
+                }
+            }
+        }
+        if(!same) {System.out.println(DIFFERENT_PHONE_NUMBER);}
     }
 
     private static String getCommand(Scanner in) {
